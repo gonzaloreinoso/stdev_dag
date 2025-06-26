@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Airflow Services",
+			"type": "shell",
+			"command": "docker-compose",
+			"args": [
+				"up",
+				"-d"
+			],
+			"group": "build",
+			"problemMatcher": [],
+			"isBackground": true
+		}
+	]
+}

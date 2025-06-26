@@ -1,0 +1,80 @@
+# Production Environment Configuration
+environment: production
+
+# Database Configuration
+database:
+  host: ${DB_HOST}
+  port: ${DB_PORT:-5432}
+  name: ${DB_NAME}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  pool_size: 20
+  max_overflow: 40
+  ssl_mode: require
+  connection_timeout: 30
+
+# Airflow Configuration
+airflow:
+  executor: CeleryExecutor
+  max_active_runs: 3
+  parallelism: 16
+  max_active_tasks_per_dag: 8
+  load_examples: false
+  catchup_by_default: false
+
+# Data Processing Configuration
+processing:
+  window_size: 20
+  batch_size: 10000
+  max_processing_time_seconds: 1800
+  enable_state_persistence: true
+  state_file_retention_days: 90
+
+# File Paths
+paths:
+  data_dir: /opt/airflow/data
+  results_dir: /opt/airflow/results
+  logs_dir: /opt/airflow/logs
+  state_dir: /opt/airflow/results
+
+# Monitoring & Alerting
+monitoring:
+  enable_metrics: true
+  enable_health_checks: true
+  alert_on_failure: true
+  alert_email: prod-alerts@company.com
+  slack_webhook: ${SLACK_WEBHOOK_URL}
+  pagerduty_key: ${PAGERDUTY_INTEGRATION_KEY}
+
+# Security
+security:
+  enable_auth: true
+  fernet_key: ${AIRFLOW_FERNET_KEY}
+  secret_key: ${AIRFLOW_SECRET_KEY}
+  enable_rbac: true
+
+# Performance
+performance:
+  enable_profiling: false
+  max_memory_usage_mb: 4096
+  task_timeout_seconds: 7200
+
+# Backup & Recovery
+backup:
+  enable_backups: true
+  backup_schedule: "0 1 * * *"  # Daily at 1 AM
+  retention_days: 365
+  backup_location: s3://company-backups/airflow/
+
+# High Availability
+ha:
+  enable_ha: true
+  redis_host: ${REDIS_HOST}
+  redis_port: ${REDIS_PORT:-6379}
+  redis_db: 0
+
+# Compliance & Auditing
+compliance:
+  enable_audit_logging: true
+  data_retention_policy: 2555  # 7 years in days
+  encryption_at_rest: true
