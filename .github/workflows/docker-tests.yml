@@ -1,0 +1,25 @@
+name: Docker Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  docker-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Build and run tests in Docker
+      run: |
+        # Build the Docker image
+        docker build -t stdev-dag-test -f Dockerfile .
+        
+        # Run the tests inside the Docker container
+        docker run --rm -v ${PWD}:/app stdev-dag-test pytest -v
