@@ -1,9 +1,5 @@
 # Standard Deviation Calculation DAG
 
-[![Python Tests](https://github.com/YOUR_USERNAME/stdev_dag/actions/workflows/python-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/stdev_dag/actions/workflows/python-tests.yml)
-[![Docker Tests](https://github.com/YOUR_USERNAME/stdev_dag/actions/workflows/docker-tests.yml/badge.svg)](https://github.com/YOUR_USERNAME/stdev_dag/actions/workflows/docker-tests.yml)
-[![Code Coverage](https://github.com/YOUR_USERNAME/stdev_dag/actions/workflows/coverage.yml/badge.svg)](https://github.com/YOUR_USERNAME/stdev_dag/actions/workflows/coverage.yml)
-
 This project implements an Apache Airflow DAG for calculating rolling standard deviations of financial price data. It uses an efficient incremental calculation approach with state persistence and includes full Docker containerization with PostgreSQL integration.
 
 ## Problem Statement
@@ -220,76 +216,9 @@ GROUP BY security_id;
 
 This project is provided as-is for educational and development purposes.
 
-## Running Tests
-
-The project includes a comprehensive test suite to ensure all components function as expected:
-
-### Local Testing
-
-```bash
-# Install test dependencies
-pip install pytest pytest-cov
-
-# Run all tests
-pytest
-
-# Run with coverage report
-pytest --cov=plugins --cov=dags
-```
-
-For convenience, you can use the Makefile or make.bat commands:
-
-```bash
-# On Linux/Mac
-make test
-make coverage
-make clean
-
-# On Windows
-make.bat test
-make.bat coverage
-make.bat clean
-```
-
-You can also run tests in Docker:
-
-```bash
-# On Linux/Mac
-make docker-test
-
-# On Windows
-make.bat docker-test
-```
-
-For simple testing on Windows, you can use the provided batch script:
-```bash
-run_tests.bat
-```
-
-### Continuous Integration
-
-This project uses GitHub Actions for continuous integration. Tests run automatically when:
-- Code is pushed to the main or develop branches
-- A pull request is made against main or develop
-
-The CI pipeline includes:
-- Python tests in multiple environments (3.8 and 3.9)
-- Docker container tests to validate the complete environment
-
-Test reports and artifacts are available in the GitHub Actions workflow runs.
-
-### Test Suite Contents
-
-The test suite includes:
-- Unit tests for the IncrementalStdevCalculator
-- Function tests for the DAG tasks
-- State management tests
-- Integration tests for the full workflow
-
 ## Support
 
 For issues and questions:
 1. Check the Airflow documentation: https://airflow.apache.org/docs/
 2. Review task logs in the Airflow web UI
 3. Check Docker container logs for infrastructure issues
-4. Run the test suite to verify component functionality
