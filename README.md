@@ -207,18 +207,6 @@ GROUP BY security_id;
 
 ## Development
 
-### Local Development
-```bash
-# Install dependencies locally
-pip install -r requirements.txt
-
-# Run tests (if you add them)
-python -m pytest tests/
-
-# Format code
-black dags/ plugins/
-```
-
 ### Debugging
 - Use Airflow's built-in logging
 - Add print statements for debugging (they appear in task logs)
@@ -228,64 +216,32 @@ black dags/ plugins/
 
 This project is provided as-is for educational and development purposes.
 
+## Running Tests
+
+The project includes a comprehensive test suite to ensure all components function as expected:
+
+```bash
+# Install test dependencies
+pip install pytest
+
+# Run all tests
+pytest
+```
+
+Alternatively, on Windows you can use the provided batch script:
+```bash
+run_tests.bat
+```
+
+The test suite includes:
+- Unit tests for the IncrementalStdevCalculator
+- Function tests for the DAG tasks
+- State management tests
+
 ## Support
 
 For issues and questions:
 1. Check the Airflow documentation: https://airflow.apache.org/docs/
 2. Review task logs in the Airflow web UI
 3. Check Docker container logs for infrastructure issues
-
-## CI/CD Pipeline
-
-[![CI/CD Pipeline](https://github.com/username/stdev_dag/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/username/stdev_dag/actions/workflows/ci-cd.yml)
-[![Security Scan](https://github.com/username/stdev_dag/actions/workflows/security.yml/badge.svg)](https://github.com/username/stdev_dag/actions/workflows/security.yml)
-
-This project implements comprehensive CI/CD practices including:
-
-### Code Quality
-- **Automated formatting** with Black and isort
-- **Linting** with flake8 and mypy
-- **Pre-commit hooks** for early issue detection
-- **Test coverage** reporting with codecov
-
-### Testing Strategy
-- **Unit tests** for individual components
-- **Integration tests** with PostgreSQL database
-- **DAG validation** for Airflow workflows
-- **Performance benchmarks** to ensure < 1s processing time
-
-### Security
-- **Static analysis** with Bandit and Semgrep
-- **Dependency scanning** with Safety and Snyk
-- **Container security** with Trivy and Hadolint
-- **Secrets detection** with TruffleHog
-
-### Deployment
-- **Multi-stage Docker builds** for optimized images
-- **Environment-specific configurations** (dev/staging/prod)
-- **Automated deployments** with GitHub Actions
-- **Health checks** and monitoring
-
-### Development Workflow
-
-1. **Setup development environment:**
-   ```bash
-   make setup-dev
-   ```
-
-2. **Run tests locally:**
-   ```bash
-   make test
-   ```
-
-3. **Check code quality:**
-   ```bash
-   make ci-local
-   ```
-
-4. **Security scan:**
-   ```bash
-   make security
-   ```
-
-For detailed CI/CD documentation, see [CI/CD Guide](docs/CI_CD_GUIDE.md).
+4. Run the test suite to verify component functionality

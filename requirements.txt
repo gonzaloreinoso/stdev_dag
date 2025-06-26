@@ -5,3 +5,4 @@ numpy==1.24.4
 psycopg2-binary==2.9.9
 pyarrow==14.0.2
 sqlalchemy==1.4.48
+pytest==7.4.0
