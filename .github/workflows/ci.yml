@@ -142,6 +142,24 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Install Docker Compose
+      run: |
+        # Try using the newer docker compose command first
+        if docker compose version; then
+          echo "Using docker compose (newer version)"
+          echo "DOCKER_COMPOSE_CMD=docker compose" >> $GITHUB_ENV
+        else
+          # Fallback to installing docker-compose
+          echo "Installing docker-compose"
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+          echo "DOCKER_COMPOSE_CMD=docker-compose" >> $GITHUB_ENV
+        fi
+        
     - name: Deploy to staging
       run: |
         echo "🚀 Deploying to staging environment..."
@@ -154,11 +172,11 @@ jobs:
         EOF
         
         # Build and deploy staging containers
-        docker-compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+        $DOCKER_COMPOSE_CMD -f docker-compose.staging.yml --env-file .env.staging up -d --build
         
         # Wait for services to be healthy
         echo "⏳ Waiting for services to be ready..."
-        timeout 300 bash -c 'until docker-compose -f docker-compose.staging.yml ps | grep -q "healthy"; do sleep 10; done'
+        timeout 300 bash -c "until $DOCKER_COMPOSE_CMD -f docker-compose.staging.yml ps | grep -q 'healthy\|running'; do sleep 10; done"
         
         # Run smoke tests
         echo "🧪 Running staging smoke tests..."
@@ -168,7 +186,7 @@ jobs:
         curl -f http://localhost:8081/health || exit 1
         
         # Verify DAG loading
-        docker-compose -f docker-compose.staging.yml exec -T airflow-staging python -c "
+        $DOCKER_COMPOSE_CMD -f docker-compose.staging.yml exec -T airflow-staging python -c "
         from airflow.models import DagBag
         dag_bag = DagBag(dag_folder='/opt/airflow/dags/', include_examples=False)
         assert len(dag_bag.import_errors) == 0, f'DAG import errors: {dag_bag.import_errors}'
@@ -178,6 +196,13 @@ jobs:
         
         echo "✅ Staging deployment successful!"
         
+    - name: Cleanup staging environment
+      if: always()
+      run: |
+        echo "🧹 Cleaning up staging environment..."
+        $DOCKER_COMPOSE_CMD -f docker-compose.staging.yml down -v || true
+        docker system prune -f || true
+
     - name: Notify deployment status
       if: always()
       run: |
