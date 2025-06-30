@@ -121,3 +121,111 @@ jobs:
             sys.exit(1)
         print(f'Successfully loaded {len(dag_bag.dags)} DAGs')
         "
+
+  staging-deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Staging
+    needs: [test, dag-validation]
+    if: false  # Temporarily disabled until secrets are set up
+    # if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Deploy to staging
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        # Create staging environment file
+        cat > .env.staging << EOF
+        POSTGRES_PASSWORD_STAGING=${{ secrets.POSTGRES_PASSWORD_STAGING }}
+        FERNET_KEY_STAGING=${{ secrets.FERNET_KEY_STAGING }}
+        WEBSERVER_SECRET_KEY_STAGING=${{ secrets.WEBSERVER_SECRET_KEY_STAGING }}
+        AIRFLOW_PASSWORD_STAGING=${{ secrets.AIRFLOW_PASSWORD_STAGING }}
+        EOF
+        
+        # Build and deploy staging containers
+        docker-compose -f docker-compose.staging.yml --env-file .env.staging up -d --build
+        
+        # Wait for services to be healthy
+        echo "⏳ Waiting for services to be ready..."
+        timeout 300 bash -c 'until docker-compose -f docker-compose.staging.yml ps | grep -q "healthy"; do sleep 10; done'
+        
+        # Run smoke tests
+        echo "🧪 Running staging smoke tests..."
+        sleep 30  # Additional wait for full initialization
+        
+        # Check if Airflow webserver is responding
+        curl -f http://localhost:8081/health || exit 1
+        
+        # Verify DAG loading
+        docker-compose -f docker-compose.staging.yml exec -T airflow-staging python -c "
+        from airflow.models import DagBag
+        dag_bag = DagBag(dag_folder='/opt/airflow/dags/', include_examples=False)
+        assert len(dag_bag.import_errors) == 0, f'DAG import errors: {dag_bag.import_errors}'
+        assert len(dag_bag.dags) > 0, 'No DAGs found'
+        print(f'✅ Successfully loaded {len(dag_bag.dags)} DAGs in staging')
+        "
+        
+        echo "✅ Staging deployment successful!"
+        
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Staging deployment successful - Available at http://staging.your-domain.com:8081"
+        else
+          echo "❌ Staging deployment failed"
+        fi
+
+  production-deploy:
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    needs: [staging-deploy]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deploying to production environment..."
+        # This would typically deploy to a production environment
+        # For now, we'll just validate the deployment process
+        echo "⚠️ Production deployment not yet implemented"
+        echo "Would deploy to production environment here"
+        
+    - name: Run production health checks
+      run: |
+        echo "🏥 Running production health checks..."
+        echo "Would run comprehensive health checks here"
+        
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "✅ Production deployment successful"
+        else
+          echo "❌ Production deployment failed"
+        fi

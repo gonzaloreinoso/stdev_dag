@@ -212,6 +212,41 @@ GROUP BY security_id;
 - Add print statements for debugging (they appear in task logs)
 - Use the Airflow web UI to inspect task instances and logs
 
+### CI/CD Pipeline Status
+
+#### ✅ Phase 1: Foundation (COMPLETED)
+- GitHub Actions CI workflow
+- Linting and formatting (Black, isort, Flake8)
+- Pre-commit hooks
+- Development environment setup
+
+#### ✅ Phase 2: Testing (COMPLETED)
+- Unit tests for calculator (100% coverage)
+- Integration tests for DAGs
+- Data quality validations
+- Automated test execution in CI
+
+#### 🚧 Phase 3: Deployment (IN PROGRESS)
+- ✅ Staging deployment configuration
+- ✅ Basic monitoring setup
+- ⚠️ Production deployment (planned)
+- ⚠️ Full monitoring and alerting (planned)
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment information.
+
+### Running Tests
+```bash
+# Run all tests
+python run_tests.py
+
+# Run specific test types
+pytest tests/unit/ -v
+pytest tests/integration/ -v
+
+# Run with coverage
+pytest tests/unit/ --cov=plugins --cov-report=html
+```
+
 ## License
 
 This project is provided as-is for educational and development purposes.

@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres-staging:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: stdev_calculations_staging
+      POSTGRES_USER: airflow_staging
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_STAGING}
+    volumes:
+      - postgres_db_staging:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5433:5432"
+    networks:
+      - airflow-staging
+
+  airflow-staging:
+    build: .
+    depends_on:
+      - postgres-staging
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow_staging:${POSTGRES_PASSWORD_STAGING}@postgres-staging/stdev_calculations_staging
+      AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY_STAGING}
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'false'
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${WEBSERVER_SECRET_KEY_STAGING}
+      _AIRFLOW_WWW_USER_USERNAME: ${AIRFLOW_USERNAME_STAGING:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${AIRFLOW_PASSWORD_STAGING}
+    volumes:
+      - ./data:/opt/airflow/data
+      - ./results:/opt/airflow/results
+      - airflow_logs_staging:/opt/airflow/logs
+    ports:
+      - "8081:8080"
+    networks:
+      - airflow-staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_db_staging:
+  airflow_logs_staging:
+
+networks:
+  airflow-staging:
+    driver: bridge
