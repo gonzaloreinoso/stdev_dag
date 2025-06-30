@@ -23,8 +23,9 @@ COPY requirements-dev.txt /tmp/requirements-dev.txt
 # Install Python dependencies in a virtual environment
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+ENV PIP_USER=false
+RUN /opt/venv/bin/pip install --no-cache-dir --upgrade pip setuptools wheel
+RUN /opt/venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Stage 2: Runtime stage
 FROM apache/airflow:2.8.1-python3.11 as runtime
