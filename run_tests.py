@@ -58,7 +58,7 @@ def main():
         subprocess.run(["python", "-m", "black", "--version"], 
                        capture_output=True, check=True, timeout=10)
         results.append(run_command(
-            "python -m black --check --diff . --exclude logs/",
+            "python -m black --check --diff .",
             "Code formatting check (Black)"
         ))
     except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired):
@@ -73,7 +73,7 @@ def main():
     
     # 3. Linting check (be more lenient)
     results.append(run_command(
-        "python -m flake8 . --extend-ignore=W293,W291,E501 --exclude=logs/",
+        "python -m flake8 .",
         "Code linting (Flake8) - relaxed"
     ))
     
