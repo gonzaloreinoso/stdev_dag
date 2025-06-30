@@ -36,7 +36,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: Run Tests
-    needs: lint-and-format
+    # needs: lint-and-format  # Temporarily disabled to allow tests to run even if linting fails
     
     services:
       postgres:
@@ -86,7 +86,7 @@ jobs:
   dag-validation:
     runs-on: ubuntu-latest
     name: Validate DAGs
-    needs: lint-and-format
+    # needs: lint-and-format  # Temporarily disabled to allow validation to run even if linting fails
     
     steps:
     - uses: actions/checkout@v4
