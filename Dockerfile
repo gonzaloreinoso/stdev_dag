@@ -47,9 +47,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY --chown=airflow:root dags/ /opt/airflow/dags/
 COPY --chown=airflow:root plugins/ /opt/airflow/plugins/
 
-# Create config directory and copy config files
+# Create config directory
 RUN mkdir -p /opt/airflow/config
-COPY --chown=airflow:root config/ /opt/airflow/config/
 
 # Create directories with proper permissions
 RUN mkdir -p /opt/airflow/data /opt/airflow/results /opt/airflow/logs \
