@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Create virtual environment directory with proper permissions
+RUN mkdir -p /opt/venv && chown -R airflow:root /opt/venv
+
 USER airflow
 
 # Copy requirements first for better Docker layer caching
