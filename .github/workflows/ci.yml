@@ -126,8 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Staging
     needs: [test, dag-validation]
-    if: false  # Temporarily disabled until secrets are set up
-    # if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
     environment: staging
     
     steps:
